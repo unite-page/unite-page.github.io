@@ -1,421 +1,509 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description"
-        content="Relate Anything in Radiance Fields">
-  <meta name="keywords" content="RelationField: Relate Anything in Radiance Fields">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RelationField</title>
+
+  <title>UNITE | Unified Semantic Transformer for 3D Scene Understanding</title>
+  <meta name="description" content="UNITE: A unified feed-forward transformer that predicts multiple 3D semantic outputs from RGB images in a single model.">
+  <meta name="keywords" content="UNITE, 3D scene understanding, semantic transformer, 3D segmentation, open-vocabulary, articulation">
+
+  <!-- Open Graph / Twitter cards -->
+  <meta property="og:title" content="UNITE: Unified Semantic Transformer for 3D Scene Understanding">
+  <meta property="og:description" content="A unified feed-forward transformer that predicts multiple 3D semantic outputs from RGB images.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="static/images/teaser.png">
+  <meta name="twitter:card" content="summary_large_image">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-L7QH2NS5H0"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
+    function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
-
     gtag('config', 'G-L7QH2NS5H0');
   </script>
 
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-        rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/click_l.png">
+  <link rel="icon" href="./static/images/equality.png">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script src="./static/js/bulma-carousel.min.js"></script>
   <script src="./static/js/bulma-slider.min.js"></script>
   <script src="./static/js/index.js"></script>
+
+  <!-- Lightweight polish without touching your external CSS -->
+  <style>
+    :root { --unite-accent: #3d7dff; }
+    html { scroll-behavior: smooth; }
+    .navbar.is-transparent { background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); }
+    .hero.is-light { background: linear-gradient(180deg, rgba(61,125,255,0.08), rgba(61,125,255,0)); }
+    .publication-title { line-height: 1.05; }
+    .tag.is-accent { background: rgba(61,125,255,0.12); color: #1f2b4d; border: 1px solid rgba(61,125,255,0.25); }
+    .button.is-disabled { pointer-events: none; opacity: 0.55; }
+    .figure-wrap img, .teaser img, img.center { max-width: 100%; height: auto; }
+    .publication-video { width: 100%; max-width: 980px; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.08); }
+    .section { padding-top: 3rem; padding-bottom: 3rem; }
+    .content p { line-height: 1.65; }
+    .soft-card { border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; padding: 1.25rem; background: #fff; box-shadow: 0 6px 22px rgba(0,0,0,0.05); }
+    .anchor { scroll-margin-top: 84px; }
+    .footnote { color: #6b7280; font-size: 0.95rem; }
+    pre code { font-size: 0.95rem; }
+  </style>
 </head>
+
 <body>
 
+  <!-- Top navigation -->
+  <nav class="navbar is-transparent is-spaced is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#top" aria-label="UNITE home">
+        <img src="static/images/equality.png" alt="UNITE icon" style="height: 28px; width: 28px;">
+        <span class="ml-2 has-text-weight-semibold">UNITE</span>
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </a>
+    </div>
 
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#abstract">Abstract</a>
+        <a class="navbar-item" href="#method">Method</a>
+        <a class="navbar-item" href="#results">Results</a>
+        <a class="navbar-item" href="#bibtex">BibTeX</a>
+      </div>
+    </div>
+  </nav>
 
-<section class="hero">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title"><img src="static/images/click_l.png" alt="Click Icon" style="width:50px; height:50px;"> RelationField<br />
-            <p class="title is-3 publication-title">Relate Anything in Radiance Fields</p>
-            <h3 class="title is-4 publication-title">CVPR 2025</h3>
-          </h1>          
-
-          <!-- <h1 class="title is-4" style="color: #5c5c5c;">CVPR 2025</h1> -->
-
-          <div class="is-size-5 publication-authors">
-            <span class="author-block">
-              <a href="https://kochsebastian.com">Sebastian Koch</a><sup>1,2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=dfjN3YAAAAAJ">Johanna Wald</a><sup>3</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=k4m1c6EAAAAJ">Mirco Colosi</a><sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=U3KSTwkAAAAJ">Narunas Vaskevicius</a><sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            <br />
-            <span class="author-block">
-              <a href="https://phermosilla.github.io">Pedro Hermosilla</a><sup>4</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            <span class="author-block">
-              <a href="https://federicotombari.github.io/">Federico Tombari</a><sup>3,5</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </span>
-            <span class="author-block">
-              <a href="https://scholar.google.com/citations?user=FuY-lbcAAAAJ">Timo Ropinski</a><sup>1</sup>
-            </span>
-          </div>
-
-          <div class="is-size-5 publication-authors">
-            <span class="author-block" style="margin-right: 1em;"><sup>1</sup>Ulm University</span>
-            <span class="author-block" style="margin-right: 1em;"><sup>2</sup>Bosch Center for AI</span>
-            <span class="author-block" style="margin-right: 1em;"><sup>3</sup>Google</span>
-            <span class="author-block" style="margin-right: 1em;"><sup>4</sup>TU Vienna</span>
-            <span class="author-block" style="margin-right: 1em;"><sup>5</sup>TU Munich</span></br>
-          </div>
-
+  <!-- Hero -->
+  <section class="hero is-light" id="top">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
           <div class="column has-text-centered">
-            <div class="publication-links">
-              <!-- PDF Link. -->
+
+            <div class="mb-3">
+              <span class="tag is-medium is-rounded is-accent">Preprint</span>
+              <!-- If you know the venue, replace "Preprint" with e.g. CVPR 2025 -->
+            </div>
+
+            <h1 class="title is-1 publication-title">
+              UNITE
+            </h1>
+
+            <h2 class="title is-3 publication-title mt-2">
+              Unified Semantic Transformer for 3D Scene Understanding
+            </h2>
+
+            <p class="footnote mt-2">
+              A single feed-forward model that unifies multiple 3D semantic tasks from RGB input.
+            </p>
+
+            <div class="is-size-5 publication-authors mt-5">
+              <span class="author-block">
+                <a href="https://kochsebastian.com">Sebastian Koch</a><sup>1,2</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=dfjN3YAAAAAJ">Johanna Wald</a><sup>2</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://muskie82.github.io/">Hide Matsuki</a><sup>2</sup>
+              </span>
+              <br>
+              <span class="author-block">
+                <a href="https://phermosilla.github.io">Pedro Hermosilla</a><sup>3</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=FuY-lbcAAAAJ">Timo Ropinski</a><sup>1</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://federicotombari.github.io/">Federico Tombari</a><sup>2,4</sup>
+              </span>
+            </div>
+
+            <div class="is-size-6 publication-authors mt-3">
+              <span class="author-block" style="margin-right: 1em;"><sup>1</sup>Ulm University</span>
+              <span class="author-block" style="margin-right: 1em;"><sup>2</sup>Google</span>
+              <span class="author-block" style="margin-right: 1em;"><sup>3</sup>TU Vienna</span>
+              <span class="author-block" style="margin-right: 1em;"><sup>4</sup>TU Munich</span>
+            </div>
+
+            <div class="publication-links mt-5">
+              <!-- Paper -->
               <span class="link-block">
-                <a href="static/pdf/koch2025relationfield.pdf"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Paper</span>
+                <a href="static/pdf/dummy_pdf.pdf" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper (PDF)</span>
                 </a>
               </span>
+
+              <!-- arXiv -->
               <span class="link-block">
-                <a href="https://arxiv.org/abs/2412.13652"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="ai ai-arxiv"></i>
-                  </span>
+                <a href="dummy_arxiv_link" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
                   <span>arXiv</span>
                 </a>
               </span>
+
+              <!-- Code -->
               <span class="link-block">
-                <a href="static/pdf/cvpr_relationfield_poster.pdf" target="_blank"
-                   class="button is-normal is-rounded is-dark">
-                   <span class="icon">
-                    <i class="fas fa-palette"></i>
-                  </span>
-                <span>Poster</span>
+                <a class="button is-normal is-rounded is-light is-disabled" aria-disabled="true">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code (coming soon)</span>
                 </a>
-            </span>
-              <!-- Code Link. -->
-              <span class="link-block">
-                <a href="https://github.com/boschresearch/relationfield"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-github"></i>
-                  </span>
-                  <span>Code</span>
-                  </a>
               </span>
-              <span class="link-block">
-                <a href="https://drive.google.com/file/d/1Zcl3l_awvml8-DSlZbVqVwM5O0kIl8pH/view?usp=drive_link"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-github"></i>
-                  </span>
-                  <span>Benchmark</span>
-                  </a>
-              </span>
-    
             </div>
 
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <img src="static/images/teaser.png" class="center"/>
-      <br><br>
-      <h2 class="subtitle has-text-centered">
-      <strong>RelationField</strong> is the first framework to extract inter-object relationships directly from radiance fields.
-    </h2>
-    <video class="publication-video" id="main-video" autobuffer muted autoplay playsinline loop controls>
-      <source id="mp4" src="static/videos/relationfield_demo_new.mp4" type="video/mp4">
-  </video>
-  </div>
-  
-</section>
-
-
-<section class="section">
-  <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            Neural radiance fields are an emerging 3D scene representation and recently even been extended to learn 
-            features for scene understanding by distilling open-vocabulary features from vision-language models. 
-            However, current method primarily focus on object-centric representations, supporting object segmentation or 
-            detection, while understanding semantic relationships between objects remains largely unexplored. To address 
-            this gap, we propose RelationField, the first method to extract inter-object relationships directly from 
-            neural radiance fields. RelationField represents relationships between objects as pairs of rays within a 
-            neural radiance field, effectively extending its formulation to include implicit relationship queries. To 
-            teach RelationField complex, open-vocabulary relationships, relationship knowledge is distilled from 
-            multi-modal LLMs. To evaluate RelationField, we solve open-vocabulary 3D scene graph generation tasks and 
-            relationship-guided instance segmentation, achieving state-of-the-art performance in both tasks.         
-          </p>
-        </div>
-      </div>
-    </div>
-    
-</section>
-
-</section>
-<section class="section">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Video</h2>
-      </div>
-    </div>
-    <div class="content has-text-centered">
-      <iframe
-        width="1000"
-        height="564"
-        src="https://www.youtube.com/embed/8XxWzoWnYT0?si=uFTNCuzN9YZSw8ss"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-full-width">
-
-        <h2 class="title is-3">Method</h2>
-      <br>
-        <div class="content has-text-justified">
-          <p>
-            RelationField learns a 3D feature field (a) that can be queried with a relationship query location
-(b) which changes the relationship field of the 3D volume depending on what position is selected. The relationship feature is sampled and
-rendered along a ray according to NeRF’s rendering weights. The language loss maximizes the cosine similarity between the extracted sparse
-features from the 2D views and the rendered 3D relationship features. <br>
-We estimate 2D relationship proposals from a multi-model
-LLM prompted with SoM (e) for each training view and encode extracted textual relationship description into the image plane (d). A pair
-pixel sampler samples subject and object pixels (c) for which the relationship feature is distilled into the 3D volume.
-          </p>
-    </div>
-
-
-
+  <!-- Teaser -->
+  <section class="section teaser">
     <div class="container is-max-desktop">
-      <div class="hero-body">
-        <img src="static/images/method.png" class="center"/>
-  
-      </div>
-    </div>
+      <div class="columns is-centered">
+        <div class="column is-full-width">
 
-<section class="section">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Qualitative results</h2>
-      <br>
-        <div class="content has-text-centered">
-          <p>
-            Using <i>RelationField</i> you can perform free form queries which capture various relationships and affordances in different scenes.
-          </p>
-    </div>
+          <figure class="figure-wrap soft-card">
+            <img src="static/images/teaser.png" alt="UNITE teaser figure" loading="lazy">
+            <figcaption class="has-text-centered mt-3">
+              <span class="has-text-weight-semibold">UNITE</span> predicts multiple 3D semantic outputs in one forward pass.
+            </figcaption>
+          </figure>
 
-    <div class="container is-max-desktop">
-      <div class="hero-body">
-        <img src="static/images/qualitative_rows_v3.png" class="center"/>
-      </div>
-    </div>
-
-    <main>
-      <div class="container is-max-desktop">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-full-width">
-            <h2 class="title is-4">RelationField w/ NeRF vs w/ Gaussian Splatting</h2>
-
-            
-        
-      <div class="slidercontainer">
-        <div class="image-slidercontainer">
-          <img
-            class="image-before slider-image"
-           src="static/images/relationfield_nerf.png"
-            
-          />
-          <img
-            class="image-after slider-image"
-            src="static/images/relationfield_gsplatting.png"
-          />
-        </div>
-        <!-- step="10" -->
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value="50"
-          aria-label="Percentage of before photo shown"
-          class="slider"
-        />
-        <div class="slider-line" aria-hidden="true"></div>
-        <div class="slider-button" aria-hidden="true">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="30"
-            height="30"
-            fill="currentColor"
-            viewBox="0 0 256 256"
-          >
-            <rect width="256" height="256" fill="none"></rect>
-            <line
-              x1="128"
-              y1="40"
-              x2="128"
-              y2="216"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            ></line>
-            <line
-              x1="96"
-              y1="128"
-              x2="16"
-              y2="128"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            ></line>
-            <polyline
-              points="48 160 16 128 48 96"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            ></polyline>
-            <line
-              x1="160"
-              y1="128"
-              x2="240"
-              y2="128"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            ></line>
-            <polyline
-              points="208 96 240 128 208 160"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            ></polyline>
-          </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="container is-max-desktop">
-  <div class="hero-body">
-    <img src="static/images/relationfield_nerf_3dgs.png" width="70%" class="center"/>
-
-  </div>
-</div>
-<div class="content has-text-centered">
-  <br><p>
-    RelationField can be trained with both NeRF as well as Gaussian Splatting geometry. Both approaches result in a high-quality RelationField.
-  </p>
-</div>
-
-  </main>
-  
-    <section class="section" id="BibTeX">
-                  <div class="container is-max-desktop content">
-                    <h2 class="title">BibTeX</h2>
-                    <div align="left">
-                    <pre><code>
-  @inproceedings{koch2025relationfield, 
-    title = {RelationField: Relate Anything in Radiance Fields}, 
-    author = {Koch, Sebastian and Wald, Johanna and Colosi, Mirco and Vaskevicius, Narunas and Hermosilla, Pedro and Tombari, Federico and Ropinski, Timo}, 
-    booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, 
-    year = {2025}
-  }
-                    </code></pre>
-                    </div>
+          <div class="columns is-centered mt-5">
+            <div class="column is-10">
+              <div class="soft-card">
+                <div class="columns is-multiline is-variable is-3">
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">Unified outputs</p>
+                    <p class="is-size-6">Semantic + instance signals, open-vocabulary features, and articulation cues in a single model.</p>
                   </div>
-                </section>
-<footer class="footer">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-          <p>
-            This website is licensed under a <a rel="license"
-              href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-              Commons Attribution-ShareAlike 4.0 International License</a>.
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">Feed-forward and fast</p>
+                    <p class="is-size-6">Runs end-to-end on unseen scenes without iterative optimization.</p>
+                  </div>
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">RGB-only prediction</p>
+                    <p class="is-size-6">Trained via 2D distillation and multi-view consistency without requiring ground-truth 3D at test time.</p>
+                  </div>
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">3D-consistent features</p>
+                    <p class="is-size-6">Multi-view losses encourage point-wise consistency across viewpoints.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="has-text-centered mt-5">
+            <video class="publication-video" id="main-video" muted autoplay playsinline loop controls preload="metadata">
+              <source src="static/videos/pipeline_video_white.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section anchor" id="abstract">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified soft-card">
+            <p>
+              Holistic 3D scene understanding requires capturing and reasoning about complex, unstructured environments.
+              Most existing approaches are tailored to a single downstream task, which makes it difficult to reuse
+              representations across objectives.
+              We introduce <strong>UNITE</strong>, a unified semantic transformer for 3D scene understanding: a feed-forward model that
+              consolidates a diverse set of 3D semantic predictions within a single network.
+              Given only RGB images, UNITE infers a 3D point-based reconstruction with dense features and jointly predicts
+              semantic segmentation, instance-aware embeddings, open-vocabulary descriptors, and signals related to affordances
+              and articulation.
+              Training combines 2D distillation from foundation models with self-supervised multi-view constraints that promote
+              3D-consistent features across views.
+              Across multiple benchmarks, UNITE matches or exceeds task-specific baselines and remains competitive even against
+              methods that rely on ground-truth 3D geometry.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section class="section anchor" id="method">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Method</h2>
+
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <div class="content has-text-justified soft-card">
+                <p>
+                  UNITE takes a set of RGB images and predicts a point cloud representation with dense per-point features.
+                  A transformer-based backbone produces a shared 3D representation that is decoded into multiple output heads
+                  (e.g., semantic labels, instance embeddings, open-vocabulary features, articulation-related signals).
+                  Supervision is obtained via 2D distillation on the input views, while multi-view consistency losses align
+                  features for pixels that correspond to the same 3D point.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <figure class="figure-wrap mt-5">
+            <img src="static/images/method.png" alt="UNITE method overview" loading="lazy">
+          </figure>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section class="section anchor" id="results">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Qualitative results</h2>
+
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <div class="content has-text-centered soft-card">
+                <p>
+                  Examples on ScanNet, ScanNet++, and MultiScan.
+                  Rows show different output modalities:
+                  (a) semantic and instance segmentation, (b) open-vocabulary retrieval, and (c) articulation prediction.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <figure class="figure-wrap mt-5">
+            <img src="static/images/qual.png" alt="Qualitative results overview grid" loading="lazy">
+          </figure>
+
+          <!-- Slice slider (kept, but cleaned up) -->
+          <div class="columns is-centered mt-6">
+            <div class="column is-11">
+              <div class="soft-card">
+                <p class="has-text-centered mb-4">
+                  UNITE Features Articulation/CLIP/Instance/RGB.
+                </p>
+                <div class="slice-slider" id="sliceSlider" style="--p1: 25%; --p2: 50%; --p3: 75%;">
+                  <div class="slice-images">
+                    <img class="slice-img img-1" src="static/images/scene0000_00_articulation_w_arrows_pred_geo_new.png" alt="Articulation prediction" loading="lazy">
+                    <img class="slice-img img-2" src="static/images/scene0000_00_clip_pred_geo_new.png" alt="Open-vocabulary features" loading="lazy">
+                    <img class="slice-img img-3" src="static/images/scene0000_00_instance_pred_geo_new.png" alt="Instance segmentation" loading="lazy">
+                    <img class="slice-img img-4" src="static/images/scene0000_00_color_pred_geo_new.png" alt="RGB input" loading="lazy">
+                  </div>
+
+                  <!-- Divider lines -->
+                  <div class="divider-line" data-handle="1" aria-hidden="true"></div>
+                  <div class="divider-line" data-handle="2" aria-hidden="true"></div>
+                  <div class="divider-line" data-handle="3" aria-hidden="true"></div>
+
+                  <!-- Draggable knobs -->
+                  <button class="divider-handle h1" type="button" aria-label="Drag divider 1" data-handle="1"></button>
+                  <button class="divider-handle h2" type="button" aria-label="Drag divider 2" data-handle="2"></button>
+                  <button class="divider-handle h3" type="button" aria-label="Drag divider 3" data-handle="3"></button>
+                </div>
+
+              
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="section anchor" id="pointclouds">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Interactive Point Clouds</h2>
+          <p class="subtitle is-6" style="max-width: 52rem; margin: 0 auto;">
+            Rotate, pan, and zoom each reconstruction. These viewers load native PLY files directly in the browser.
           </p>
-          <p>
-            It borrows the source code of <a href="https://github.com/nerfies/nerfies.github.io">this website</a>.
-            We would like to thank Utkarsh Sinha and Keunhong Park.
+        </div>
+      </div>
+
+      <div class="columns is-multiline is-centered">
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 1</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/1/input.ply" aria-label="PLY viewer 1"></div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 2</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/2/input.ply" aria-label="PLY viewer 2"></div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 3</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/3/input.ply" aria-label="PLY viewer 3"></div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 4</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/4/input.ply" aria-label="PLY viewer 4"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="footnote mt-4">
+        Note: for local testing, serve this page via a web server (e.g., GitHub Pages) so browser module imports and file loading work correctly.
+      </p>
+    </div>
+  </section> -->
+  <!-- BibTeX -->
+  <section class="section anchor" id="bibtex">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3 has-text-centered">BibTeX</h2>
+      <div class="columns is-centered">
+        <div class="column is-10">
+          <div class="soft-card" style="overflow-x:auto;">
+<pre><code>@article{koch2025unite,
+  title   = {Unified Semantic Transformer for 3D Scene Understanding},
+  author  = {Koch, Sebastian and Wald, Johanna and Matsuki, Hide and Hermosilla, Pedro and Ropinski, Timo and Tombari, Federico},
+  journal = {arXiv preprint},
+  year    = {2025}
+}</code></pre>
+          </div>
+          <p class="footnote mt-3">
+            Replace <code>arXiv preprint</code> with your venue and add an <code>eprint</code> field once available.
           </p>
         </div>
       </div>
     </div>
-  </div>
-</footer>
-<script>
-//   const slidercontainer = document.querySelector('.slidercontainer');
-// document.querySelector('.slider').addEventListener('input', (e) => {
-//   slidercontainer.style.setProperty('--position', `${e.target.value}%`);
-// })
-const slidercontainer = document.querySelector('.slidercontainer');
-const slider = document.querySelector('.slider');
+  </section>
 
-document.addEventListener('mousemove', (e) => {
-  const rect = slidercontainer.getBoundingClientRect();
-  let position = ((e.clientX - rect.left) / rect.width) * 100;
-  position = Math.max(0, Math.min(100, position)); // Constrain between 0 and 100
-  slidercontainer.style.setProperty('--position', `${position}%`);
-  slider.value = position; // Update slider value
-});
-</script>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content has-text-centered">
+            <p>
+              This website is licensed under a
+              <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+            <p>
+              It borrows the source code of
+              <a href="https://github.com/nerfies/nerfies.github.io">this website</a>.
+              Thanks to Utkarsh Sinha and Keunhong Park.
+            </p>
+            <p>
+              <a href="#top">Back to top</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Navbar burger toggle (Bulma) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      if ($navbarBurgers.length > 0) {
+        $navbarBurgers.forEach(el => {
+          el.addEventListener('click', () => {
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+          });
+        });
+      }
+    });
+  </script>
+
+  <!-- Slice slider interaction -->
+  <script>
+    (function () {
+      const root = document.getElementById("sliceSlider");
+      if (!root) return;
+
+      const minGap = 5; // percent, minimum distance between dividers
+      let draggingHandle = null;
+
+      function getPercents() {
+        const cs = getComputedStyle(root);
+        const p1 = parseFloat(cs.getPropertyValue("--p1"));
+        const p2 = parseFloat(cs.getPropertyValue("--p2"));
+        const p3 = parseFloat(cs.getPropertyValue("--p3"));
+        return { p1, p2, p3 };
+      }
+
+      function setPercent(handleIdx, value) {
+        const { p1, p2, p3 } = getPercents();
+        if (handleIdx === 1) {
+          const v = Math.max(0, Math.min(value, p2 - minGap));
+          root.style.setProperty("--p1", `${v}%`);
+        } else if (handleIdx === 2) {
+          const v = Math.max(p1 + minGap, Math.min(value, p3 - minGap));
+          root.style.setProperty("--p2", `${v}%`);
+        } else if (handleIdx === 3) {
+          const v = Math.max(p2 + minGap, Math.min(value, 100));
+          root.style.setProperty("--p3", `${v}%`);
+        }
+      }
+
+      function xToPercent(clientX) {
+        const rect = root.getBoundingClientRect();
+        const x = ((clientX - rect.left) / rect.width) * 100;
+        return Math.max(0, Math.min(100, x));
+      }
+
+      function onPointerDown(e) {
+        const idx = Number(e.currentTarget.dataset.handle);
+        draggingHandle = idx;
+        e.currentTarget.setPointerCapture?.(e.pointerId);
+        setPercent(idx, xToPercent(e.clientX));
+      }
+
+      function onPointerMove(e) {
+        if (!draggingHandle) return;
+        setPercent(draggingHandle, xToPercent(e.clientX));
+      }
+
+      function onPointerUp() {
+        draggingHandle = null;
+      }
+
+      root.querySelectorAll(".divider-handle, .divider-line").forEach((el) => {
+        el.addEventListener("pointerdown", onPointerDown);
+      });
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    })();
+  </script>
+
 </body>
 </html>
-
-

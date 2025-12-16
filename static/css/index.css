@@ -297,3 +297,73 @@ main {
   /* z-index: 100; */
   box-shadow: 1px 1px 1px hsl(0, 50%, 2%, .5);
 }
+
+ .slice-slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    max-width: 900px;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* adjust as you like */
+    touch-action: none;
+    --p1: 25%;
+    --p2: 50%;
+    --p3: 75%;
+  }
+
+  .slice-images {
+    position: absolute;
+    inset: 0;
+  }
+
+  .slice-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Each image is clipped to its slice: [0..p1], [p1..p2], [p2..p3], [p3..100] */
+  .img-1 { clip-path: inset(0 calc(100% - var(--p1)) 0 0); }
+  .img-2 { clip-path: inset(0 calc(100% - var(--p2)) 0 var(--p1)); }
+  .img-3 { clip-path: inset(0 calc(100% - var(--p3)) 0 var(--p2)); }
+  .img-4 { clip-path: inset(0 0 0 var(--p3)); }
+
+  .divider-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0.2rem;
+    background: #fff;
+    transform: translateX(-50%);
+    cursor: ew-resize;
+  }
+
+  .divider-line[data-handle="1"] { left: var(--p1); }
+  .divider-line[data-handle="2"] { left: var(--p2); }
+  .divider-line[data-handle="3"] { left: var(--p3); }
+
+  .divider-handle {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 0;
+    background: #fff;
+    box-shadow: 1px 1px 1px hsl(0 50% 2% / 0.5);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .divider-handle:active { cursor: grabbing; }
+  .divider-handle:focus-visible {
+    outline: 4px solid black;
+    outline-offset: 3px;
+  }
+
+  .divider-handle.h1 { left: var(--p1); }
+  .divider-handle.h2 { left: var(--p2); }
+  .divider-handle.h3 { left: var(--p3); }

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>UNITE | Unified Semantic Transformer for 3D Scene Understanding</title>
+  <meta name="description" content="UNITE: A unified feed-forward transformer that predicts multiple 3D semantic outputs from RGB images in a single model.">
+  <meta name="keywords" content="UNITE, 3D scene understanding, semantic transformer, 3D segmentation, open-vocabulary, articulation">
+
+  <!-- Open Graph / Twitter cards -->
+  <meta property="og:title" content="UNITE: Unified Semantic Transformer for 3D Scene Understanding">
+  <meta property="og:description" content="A unified feed-forward transformer that predicts multiple 3D semantic outputs from RGB images.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="static/images/teaser.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L7QH2NS5H0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-L7QH2NS5H0');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/click_l.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <!-- Lightweight polish without touching your external CSS -->
+  <style>
+    :root { --unite-accent: #3d7dff; }
+    html { scroll-behavior: smooth; }
+    .navbar.is-transparent { background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); }
+    .hero.is-light { background: linear-gradient(180deg, rgba(61,125,255,0.08), rgba(61,125,255,0)); }
+    .publication-title { line-height: 1.05; }
+    .tag.is-accent { background: rgba(61,125,255,0.12); color: #1f2b4d; border: 1px solid rgba(61,125,255,0.25); }
+    .button.is-disabled { pointer-events: none; opacity: 0.55; }
+    .figure-wrap img, .teaser img, img.center { max-width: 100%; height: auto; }
+    .publication-video { width: 100%; max-width: 980px; border-radius: 14px; box-shadow: 0 6px 25px rgba(0,0,0,0.08); }
+    .section { padding-top: 3rem; padding-bottom: 3rem; }
+    .content p { line-height: 1.65; }
+    .soft-card { border: 1px solid rgba(0,0,0,0.08); border-radius: 18px; padding: 1.25rem; background: #fff; box-shadow: 0 6px 22px rgba(0,0,0,0.05); }
+    .anchor { scroll-margin-top: 84px; }
+    .footnote { color: #6b7280; font-size: 0.95rem; }
+    pre code { font-size: 0.95rem; }
+  
+    /* Point cloud viewer grid */
+    .pc-card { background: #fff; border: 1px solid rgba(10,10,10,0.08); border-radius: 16px; padding: 0.75rem; box-shadow: 0 8px 24px rgba(0,0,0,0.06); height: 100%; }
+    .pc-caption { font-size: 0.95rem; margin: 0 0 0.5rem 0; color: rgba(0,0,0,0.72); }
+@media (max-width: 768px) {
+}
+
+  
+    .pc-canvas-wrap { position: relative; width: 100%; padding-top: 110%; border-radius: 12px; overflow: hidden; background: #0b0f1a; }
+    .pc-canvas-wrap canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; }
+    .pc-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 0.95rem; letter-spacing: 0.2px; }
+    .pc-error { position: absolute; inset: 0; padding: 0.75rem; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.9); text-align: center; font-size: 0.9rem; }
+</style>
+</head>
+
+<body>
+
+  <!-- Top navigation -->
+  <nav class="navbar is-transparent is-spaced is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#top" aria-label="UNITE home">
+        <img src="static/images/click_l.png" alt="UNITE icon" style="height: 28px; width: 28px;">
+        <span class="ml-2 has-text-weight-semibold">UNITE</span>
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#abstract">Abstract</a>
+        <a class="navbar-item" href="#method">Method</a>
+        <a class="navbar-item" href="#results">Results</a>
+        <a class="navbar-item" href="#pointclouds">Point Clouds</a>
+        <a class="navbar-item" href="#bibtex">BibTeX</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero is-light" id="top">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+
+            <div class="mb-3">
+              <span class="tag is-medium is-rounded is-accent">Preprint</span>
+              <!-- If you know the venue, replace "Preprint" with e.g. CVPR 2025 -->
+            </div>
+
+            <h1 class="title is-1 publication-title">
+              UNITE
+            </h1>
+
+            <h2 class="title is-3 publication-title mt-2">
+              Unified Semantic Transformer for 3D Scene Understanding
+            </h2>
+
+            <p class="footnote mt-2">
+              A single feed-forward model that unifies multiple 3D semantic tasks from RGB input.
+            </p>
+
+            <div class="is-size-5 publication-authors mt-5">
+              <span class="author-block">
+                <a href="https://kochsebastian.com">Sebastian Koch</a><sup>1,2</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=dfjN3YAAAAAJ">Johanna Wald</a><sup>2</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://muskie82.github.io/">Hide Matsuki</a><sup>2</sup>
+              </span>
+              <br>
+              <span class="author-block">
+                <a href="https://phermosilla.github.io">Pedro Hermosilla</a><sup>3</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=FuY-lbcAAAAJ">Timo Ropinski</a><sup>1</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://federicotombari.github.io/">Federico Tombari</a><sup>2,5</sup>
+              </span>
+            </div>
+
+            <div class="is-size-6 publication-authors mt-3">
+              <span class="author-block" style="margin-right: 1em;"><sup>1</sup>Ulm University</span>
+              <span class="author-block" style="margin-right: 1em;"><sup>2</sup>Google</span>
+              <span class="author-block" style="margin-right: 1em;"><sup>3</sup>TU Vienna</span>
+              <span class="author-block" style="margin-right: 1em;"><sup>5</sup>TU Munich</span>
+            </div>
+
+            <div class="publication-links mt-5">
+              <!-- Paper -->
+              <span class="link-block">
+                <a href="static/pdf/dummy_pdf.pdf" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper (PDF)</span>
+                </a>
+              </span>
+
+              <!-- arXiv -->
+              <span class="link-block">
+                <a href="dummy_arxiv_link" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              <!-- Code -->
+              <span class="link-block">
+                <a class="button is-normal is-rounded is-light is-disabled" aria-disabled="true">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code (coming soon)</span>
+                </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaser -->
+  <section class="section teaser">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+
+          <figure class="figure-wrap soft-card">
+            <img src="static/images/teaser.png" alt="UNITE teaser figure" loading="lazy">
+            <figcaption class="has-text-centered mt-3">
+              <span class="has-text-weight-semibold">UNITE</span> predicts multiple 3D semantic outputs in one forward pass.
+            </figcaption>
+          </figure>
+
+          <div class="columns is-centered mt-5">
+            <div class="column is-10">
+              <div class="soft-card">
+                <div class="columns is-multiline is-variable is-3">
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">Unified outputs</p>
+                    <p class="is-size-6">Semantic + instance signals, open-vocabulary features, and articulation cues in a single model.</p>
+                  </div>
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">Feed-forward and fast</p>
+                    <p class="is-size-6">Runs end-to-end on unseen scenes without iterative optimization.</p>
+                  </div>
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">RGB-only supervision</p>
+                    <p class="is-size-6">Trained via 2D distillation and multi-view consistency without requiring ground-truth 3D at test time.</p>
+                  </div>
+                  <div class="column is-6">
+                    <p class="has-text-weight-semibold">3D-consistent features</p>
+                    <p class="is-size-6">Multi-view losses encourage point-wise consistency across viewpoints.</p>
+                  </div>
+                </div>
+              </div>
+              <p class="footnote has-text-centered mt-3">
+                Note: update the demo video below if it still points to assets from another project.
+              </p>
+            </div>
+          </div>
+
+          <div class="has-text-centered mt-5">
+            <video class="publication-video" id="main-video" muted autoplay playsinline loop controls preload="metadata">
+              <source src="static/videos/relationfield_demo_new.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section anchor" id="abstract">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified soft-card">
+            <p>
+              Holistic 3D scene understanding requires capturing and reasoning about complex, unstructured environments.
+              Most existing approaches are tailored to a single downstream task, which makes it difficult to reuse
+              representations across objectives.
+              We introduce <strong>UNITE</strong>, a unified semantic transformer for 3D scene understanding: a feed-forward model that
+              consolidates a diverse set of 3D semantic predictions within a single network.
+              Given only RGB images, UNITE infers a 3D point-based reconstruction with dense features and jointly predicts
+              semantic segmentation, instance-aware embeddings, open-vocabulary descriptors, and signals related to affordances
+              and articulation.
+              Training combines 2D distillation from foundation models with self-supervised multi-view constraints that promote
+              3D-consistent features across views.
+              Across multiple benchmarks, UNITE matches or exceeds task-specific baselines and remains competitive even against
+              methods that rely on ground-truth 3D geometry.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section class="section anchor" id="method">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Method</h2>
+
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <div class="content has-text-justified soft-card">
+                <p>
+                  UNITE takes a set of RGB images and predicts a point cloud representation with dense per-point features.
+                  A transformer-based backbone produces a shared 3D representation that is decoded into multiple output heads
+                  (e.g., semantic labels, instance embeddings, open-vocabulary features, articulation-related signals).
+                  Supervision is obtained via 2D distillation on the input views, while multi-view consistency losses align
+                  features for pixels that correspond to the same 3D point.
+                </p>
+                <ul>
+                  <li><strong>Single backbone, multiple heads</strong> for diverse 3D semantic outputs.</li>
+                  <li><strong>RGB-only inference</strong> on unseen scenes, end-to-end and feed-forward.</li>
+                  <li><strong>Multi-view consistency</strong> to promote 3D-aligned features across viewpoints.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <figure class="figure-wrap mt-5">
+            <img src="static/images/method.png" alt="UNITE method overview" loading="lazy">
+          </figure>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section class="section anchor" id="results">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Qualitative results</h2>
+
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <div class="content has-text-centered soft-card">
+                <p>
+                  Examples on ScanNet, ScanNet++, and MultiScan.
+                  Rows show different output modalities:
+                  (a) semantic and instance segmentation, (b) open-vocabulary retrieval, and (c) articulation prediction.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <figure class="figure-wrap mt-5">
+            <img src="static/images/qual.png" alt="Qualitative results overview grid" loading="lazy">
+          </figure>
+
+          <!-- Slice slider (kept, but cleaned up) -->
+          <div class="columns is-centered mt-6">
+            <div class="column is-11">
+              <div class="soft-card">
+                <p class="has-text-centered mb-4">
+                  Interactive comparison (drag the dividers).
+                </p>
+
+                <div class="slice-slider" id="sliceSlider" style="--p1: 25%; --p2: 50%; --p3: 75%;">
+                  <div class="slice-images">
+                    <img class="slice-img img-1" src="static/images/scene0000_00_articulation_w_arrows_pred_geo_new.png" alt="Articulation prediction" loading="lazy">
+                    <img class="slice-img img-2" src="static/images/scene0000_00_clip_pred_geo_new.png" alt="Open-vocabulary features" loading="lazy">
+                    <img class="slice-img img-3" src="static/images/scene0000_00_instance_pred_geo_new.png" alt="Instance segmentation" loading="lazy">
+                    <img class="slice-img img-4" src="static/images/scene0000_00_color_pred_geo_new.png" alt="RGB input" loading="lazy">
+                  </div>
+
+                  <!-- Divider lines -->
+                  <div class="divider-line" data-handle="1" aria-hidden="true"></div>
+                  <div class="divider-line" data-handle="2" aria-hidden="true"></div>
+                  <div class="divider-line" data-handle="3" aria-hidden="true"></div>
+
+                  <!-- Draggable knobs -->
+                  <button class="divider-handle h1" type="button" aria-label="Drag divider 1" data-handle="1"></button>
+                  <button class="divider-handle h2" type="button" aria-label="Drag divider 2" data-handle="2"></button>
+                  <button class="divider-handle h3" type="button" aria-label="Drag divider 3" data-handle="3"></button>
+                </div>
+
+                <p class="footnote mt-4">
+                  Tip: if you want this to work well on mobile, consider increasing handle size and adding a short "How to use" hint.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BibTeX -->
+  <!-- Point Clouds -->
+  <section class="section anchor" id="pointclouds">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3">Interactive Point Clouds</h2>
+          <p class="subtitle is-6" style="max-width: 52rem; margin: 0 auto;">
+            Rotate, pan, and zoom each reconstruction. These viewers load native PLY files directly in the browser.
+          </p>
+        </div>
+      </div>
+
+      <div class="columns is-multiline is-centered">
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 1</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="/Users/smac/unite-page.github.io/static/test2.ply" aria-label="PLY viewer 1"></div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 2</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/2/input.ply" aria-label="PLY viewer 2"></div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 3</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/3/input.ply" aria-label="PLY viewer 3"></div>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter-desktop is-half-tablet">
+          <div class="pc-card">
+            <p class="pc-caption">Example 4</p>
+            <div class="pc-canvas-wrap ply-viewer" data-src="static/pointclouds/4/input.ply" aria-label="PLY viewer 4"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="footnote mt-4">
+        Note: for local testing, serve this page via a web server (e.g., GitHub Pages) so browser module imports and file loading work correctly.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content has-text-centered">
+            <p>
+              This website is licensed under a
+              <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+            <p>
+              It borrows the source code of
+              <a href="https://github.com/nerfies/nerfies.github.io">this website</a>.
+              Thanks to Utkarsh Sinha and Keunhong Park.
+            </p>
+            <p>
+              <a href="#top">Back to top</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Navbar burger toggle (Bulma) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      if ($navbarBurgers.length > 0) {
+        $navbarBurgers.forEach(el => {
+          el.addEventListener('click', () => {
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+          });
+        });
+      }
+    });
+  </script>
+
+  <!-- Slice slider interaction -->
+  <script>
+    (function () {
+      const root = document.getElementById("sliceSlider");
+      if (!root) return;
+
+      const minGap = 5; // percent, minimum distance between dividers
+      let draggingHandle = null;
+
+      function getPercents() {
+        const cs = getComputedStyle(root);
+        const p1 = parseFloat(cs.getPropertyValue("--p1"));
+        const p2 = parseFloat(cs.getPropertyValue("--p2"));
+        const p3 = parseFloat(cs.getPropertyValue("--p3"));
+        return { p1, p2, p3 };
+      }
+
+      function setPercent(handleIdx, value) {
+        const { p1, p2, p3 } = getPercents();
+        if (handleIdx === 1) {
+          const v = Math.max(0, Math.min(value, p2 - minGap));
+          root.style.setProperty("--p1", `${v}%`);
+        } else if (handleIdx === 2) {
+          const v = Math.max(p1 + minGap, Math.min(value, p3 - minGap));
+          root.style.setProperty("--p2", `${v}%`);
+        } else if (handleIdx === 3) {
+          const v = Math.max(p2 + minGap, Math.min(value, 100));
+          root.style.setProperty("--p3", `${v}%`);
+        }
+      }
+
+      function xToPercent(clientX) {
+        const rect = root.getBoundingClientRect();
+        const x = ((clientX - rect.left) / rect.width) * 100;
+        return Math.max(0, Math.min(100, x));
+      }
+
+      function onPointerDown(e) {
+        const idx = Number(e.currentTarget.dataset.handle);
+        draggingHandle = idx;
+        e.currentTarget.setPointerCapture?.(e.pointerId);
+        setPercent(idx, xToPercent(e.clientX));
+      }
+
+      function onPointerMove(e) {
+        if (!draggingHandle) return;
+        setPercent(draggingHandle, xToPercent(e.clientX));
+      }
+
+      function onPointerUp() {
+        draggingHandle = null;
+      }
+
+      root.querySelectorAll(".divider-handle, .divider-line").forEach((el) => {
+        el.addEventListener("pointerdown", onPointerDown);
+      });
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    })();
+  </script>
+
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.182.0/build/three.module.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.182.0/examples/jsm/controls/OrbitControls.js';
+    import { PLYLoader } from 'https://unpkg.com/three@0.182.0/examples/jsm/loaders/PLYLoader.js';
+
+    function initPLYViewer(container) {
+      const src = container.dataset.src;
+      if (!src) return;
+
+      const loading = document.createElement('div');
+      loading.className = 'pc-loading';
+      loading.textContent = 'Loading…';
+      container.appendChild(loading);
+
+      const scene = new THREE.Scene();
+
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 2000);
+      camera.position.set(0, 0, 2);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(1, 1, false);
+      container.appendChild(renderer.domElement);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.rotateSpeed = 0.7;
+
+      // Lighting helps if the PLY contains faces (mesh). For pure points, it has no effect.
+      scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+      dir.position.set(2, 2, 2);
+      scene.add(dir);
+
+      const loader = new PLYLoader();
+      loader.load(
+        src,
+        (geometry) => {
+          // If your PLY stores colors as diffuse_red/green/blue, map them:
+          // loader.setPropertyNameMapping({ diffuse_red: 'red', diffuse_green: 'green', diffuse_blue: 'blue' });
+
+          geometry.computeBoundingSphere();
+          geometry.center();
+
+          const hasColor = Boolean(geometry.getAttribute('color'));
+          let object3d;
+
+          if (geometry.index) {
+            geometry.computeVertexNormals();
+            const material = new THREE.MeshStandardMaterial({
+              vertexColors: hasColor,
+              roughness: 0.85,
+              metalness: 0.0
+            });
+            object3d = new THREE.Mesh(geometry, material);
+          } else {
+            const radius = geometry.boundingSphere?.radius || 1;
+            const material = new THREE.PointsMaterial({
+              size: Math.max(radius / 220, 0.003),
+              sizeAttenuation: true,
+              vertexColors: hasColor
+            });
+            object3d = new THREE.Points(geometry, material);
+          }
+
+          scene.add(object3d);
+
+          const radius = geometry.boundingSphere?.radius || 1;
+          const fov = camera.fov * Math.PI / 180;
+          const dist = radius / Math.sin(fov / 2);
+          camera.position.set(0, 0, dist * 1.15);
+          controls.target.set(0, 0, 0);
+          controls.update();
+
+          loading.remove();
+        },
+        undefined,
+        (err) => {
+          loading.remove();
+          const error = document.createElement('div');
+          error.className = 'pc-error';
+          error.textContent = 'Failed to load point cloud. Check the file path and that it is served over HTTP(S).';
+          container.appendChild(error);
+          console.error('PLY load error:', src, err);
+        }
+      );
+
+      const ro = new ResizeObserver(() => {
+        const w = container.clientWidth || 1;
+        const h = container.clientHeight || 1;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      });
+      ro.observe(container);
+
+      function animate() {
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    document.querySelectorAll('.ply-viewer[data-src]').forEach(initPLYViewer);
+  </script>
+
+</body>
+</html>
